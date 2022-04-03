@@ -70,6 +70,9 @@ def main():
     plt.tight_layout()
     plt.show()
 
+    data = np.hstack([y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]), conf])
+    np.savetxt('test.csv', data, delimiter=',', fmt='%s')
+
     flag = (t >= 1980)
     var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
     diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
