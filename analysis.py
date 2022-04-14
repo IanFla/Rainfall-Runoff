@@ -9,11 +9,11 @@ plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 def read(end, lag):
     length = end - 1962 + 1
     data = pd.read_excel('data.xlsx')
-    flag = (data['year'] >= 1962 - lag + 1) & (data['year'] <= end)
+    flag = (data['year'] >= 1962 - lag) & (data['year'] <= end)
     data = data[flag]
-    t = data['year'].values[lag - 1:]
+    t = data['year'].values[lag:]
     x = data['rainfall'].values
-    y = data['runoff'].values[lag - 1:]
+    y = data['runoff'].values[lag:]
     X = np.array([x[i:i + lag] for i in range(length)])
     X = sm.add_constant(X)
     return t, X, y
@@ -27,7 +27,7 @@ def fit(lag):
 
 
 def draw():
-    lag = np.arange(2, 11)
+    lag = np.arange(0, 10)
     R2 = []
     R2_adj = []
     AIC = []
@@ -55,9 +55,9 @@ def draw():
 
 
 def main():
-    # draw()
-    res = fit(4)
-    t, X, y = read(2020, 4)
+    draw()
+    res = fit(3)
+    t, X, y = read(2020, 3)
     res2 = res.get_prediction(X)
     conf = res2.conf_int()
     plt.plot(t, y, 'g', label='实际泉流量')
