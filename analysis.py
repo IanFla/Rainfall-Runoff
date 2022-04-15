@@ -14,7 +14,7 @@ def read(end, lag):
     t = data['year'].values[lag:]
     x = data['rainfall'].values
     y = data['runoff'].values[lag:]
-    X = np.array([x[i:i + lag] for i in range(length)])
+    X = np.array([np.flip(x[i:i + lag + 1]) for i in range(length)])
     X = sm.add_constant(X)
     return t, X, y
 
@@ -28,27 +28,16 @@ def fit(lag):
 
 def draw():
     lag = np.arange(0, 10)
-    R2 = []
-    R2_adj = []
     AIC = []
     BIC = []
     for l in lag:
         res = fit(l)
-        R2.append(res.rsquared)
-        R2_adj.append(res.rsquared_adj)
         AIC.append(res.aic)
         BIC.append(res.bic)
 
-    plt.plot(lag, R2, label='决定系数')
-    plt.plot(lag, R2_adj, label='经调整决定系数')
-    plt.xlabel(r'滞后年数 $L$')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
     plt.plot(lag, AIC, label='赤池信息量')
     plt.plot(lag, BIC, label='贝叶斯信息量')
-    plt.xlabel(r'滞后年数 $L$')
+    plt.xlabel(r'最大滞后年数 $L$')
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -57,6 +46,8 @@ def draw():
 def main():
     draw()
     res = fit(3)
+    print(res.summary())
+
     t, X, y = read(2020, 3)
     res2 = res.get_prediction(X)
     conf = res2.conf_int()
