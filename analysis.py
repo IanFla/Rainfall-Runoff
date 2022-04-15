@@ -30,13 +30,23 @@ def draw():
     lag = np.arange(0, 10)
     AIC = []
     BIC = []
+    R2 = []
+    R2_adj = []
     for l in lag:
         res = fit(l)
         AIC.append(res.aic)
         BIC.append(res.bic)
+        R2.append(res.rsquared)
+        R2_adj.append(res.rsquared_adj)
 
     plt.plot(lag, AIC, label='赤池信息量')
     plt.plot(lag, BIC, label='贝叶斯信息量')
+    plt.xlabel(r'最大滞后年数 $L$')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.plot(lag, R2, label='决定系数')
     plt.xlabel(r'最大滞后年数 $L$')
     plt.legend()
     plt.tight_layout()
@@ -68,6 +78,7 @@ def main():
     var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
     diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
     print(diff, [diff - 1.96 * np.sqrt(var), diff + 1.96 * np.sqrt(var)])
+    print(res2.predicted_mean)
 
 
 if __name__ == '__main__':
