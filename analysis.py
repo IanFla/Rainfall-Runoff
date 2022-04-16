@@ -39,8 +39,8 @@ def draw():
         R2.append(res.rsquared)
         R2_adj.append(res.rsquared_adj)
 
-    plt.plot(lag, AIC, label='赤池信息量')
-    plt.plot(lag, BIC, label='贝叶斯信息量')
+    plt.plot(lag, AIC, label='赤池信息量准则')
+    plt.plot(lag, BIC, label='贝叶斯信息量准则')
     plt.xlabel(r'最大滞后年数 $L$')
     plt.legend()
     plt.tight_layout()
@@ -54,7 +54,7 @@ def draw():
 
 
 def main():
-    # draw()
+    draw()
     res = fit(3)
     print(res.summary())
 
