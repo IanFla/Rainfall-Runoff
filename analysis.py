@@ -14,7 +14,7 @@ def read(end, lag):
     t = data['year'].values[lag:]
     x = data['rainfall'].values
     y = data['runoff'].values[lag:]
-    X = np.array([np.flip(x[i:i + lag + 1]) for i in range(length)])
+    X = np.array([np.flip(x[i:i + lag]) for i in range(length)])
     X = sm.add_constant(X)
     return t, X, y
 
@@ -27,7 +27,7 @@ def fit(lag):
 
 
 def draw():
-    lag = np.arange(0, 10)
+    lag = np.arange(1, 10)
     AIC = []
     BIC = []
     R2 = []
@@ -58,7 +58,7 @@ def main():
     res = fit(3)
     print(res.summary())
 
-    t, X, y = read(2020, 3)
+    t, X, y = read(2021, 3)
     res2 = res.get_prediction(X)
     conf = res2.conf_int()
     plt.plot(t, y, 'g', label='实际泉流量')
@@ -74,11 +74,11 @@ def main():
     # data = np.hstack([y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]), conf])
     # np.savetxt('test.csv', data, delimiter=',', fmt='%s')
 
-    # flag = (t >= 1980)
-    # var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
-    # diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
-    # print(diff, [diff - 1.96 * np.sqrt(var), diff + 1.96 * np.sqrt(var)])
-    # print(res2.predicted_mean)
+    flag = (t >= 1980)
+    var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
+    diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
+    print(diff, [diff - 1.96 * np.sqrt(var), diff + 1.96 * np.sqrt(var)])
+    print(res2.predicted_mean)
 
 
 if __name__ == '__main__':
