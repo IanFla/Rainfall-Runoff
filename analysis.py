@@ -14,13 +14,14 @@ def read(end, lag):
     t = data['year'].values[lag:]
     x = data['rainfall'].values
     y = data['runoff'].values[lag:]
+    z = data['mining'].values[lag:]
     X = np.array([np.flip(x[i:i + lag]) for i in range(length)])
     X = sm.add_constant(X)
-    return t, X, y
+    return t, X, y, z
 
 
 def fit(lag):
-    t, X, y = read(1979, lag)
+    t, X, y, z = read(1979, lag)
     mod = sm.OLS(y, X)
     res = mod.fit()
     return res
@@ -54,38 +55,49 @@ def draw():
 
 
 def main():
-    draw()
+    # draw()
     res = fit(3)
-    print(res.summary())
+    # print(res.summary())
 
-    t, X, y = read(2021, 3)
+    t, X, y, z = read(2021, 3)
     res2 = res.get_prediction(X)
     conf = res2.conf_int()
-    plt.plot(t, y, 'g', label='实际泉流量')
-    plt.plot(t, res2.predicted_mean, 'r', label='理论泉流量')
-    plt.plot(t, conf[:, 0], '--r')
-    plt.plot(t, conf[:, 1], '--r')
+    # plt.plot(t, y, 'g', label='实际泉流量')
+    # plt.plot(t, res2.predicted_mean, 'r', label='理论泉流量')
+    # plt.plot(t, conf[:, 0], '--r')
+    # plt.plot(t, conf[:, 1], '--r')
+    # plt.xlabel('年份')
+    # plt.ylabel(r'泉流量（$m^3/s$）')
+    # plt.legend()
+    # plt.tight_layout()
+    # plt.show()
+
+    flag = (t >= 1980)
+    z_cum = np.sum(z[(t >= 1973) & (t <= 1979)]) + np.cumsum(z[flag])
+    plt.plot(t[flag], z_cum / 6, 'y')
+    plt.plot(t[flag], res2.predicted_mean[flag] - y[flag], 'b')
+    plt.plot(t[flag], conf[flag, 0] - y[flag], '--b')
+    plt.plot(t[flag], conf[flag, 1] - y[flag], '--b')
     plt.xlabel('年份')
-    plt.ylabel(r'泉流量（$m^3/s$）')
-    plt.legend()
+    plt.ylabel(r'损失泉流量（$m^3/s$）')
     plt.tight_layout()
     plt.show()
 
-    data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]), conf])
-    np.savetxt('test.csv', data, delimiter=',', fmt='%s')
+    # data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]), conf])
+    # np.savetxt('test.csv', data, delimiter=',', fmt='%s')
 
-    flag1 = (t >= 1980) & (t <= 2000)
-    flag2 = (t >= 2000) & (t <= 2021)
-    flag = (t >= 1980)
-    var1 = np.sum(res2.var_pred_mean[flag1]) / (np.sum(flag1) ** 2)
-    diff1 = np.sum((res2.predicted_mean - y)[flag1]) / np.sum(flag1)
-    print(diff1, [diff1 - 1.96 * np.sqrt(var1), diff1 + 1.96 * np.sqrt(var1)])
-    var2 = np.sum(res2.var_pred_mean[flag2]) / (np.sum(flag2) ** 2)
-    diff2 = np.sum((res2.predicted_mean - y)[flag2]) / np.sum(flag2)
-    print(diff2, [diff2 - 1.96 * np.sqrt(var2), diff2 + 1.96 * np.sqrt(var2)])
-    var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
-    diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
-    print(diff, [diff - 1.96 * np.sqrt(var), diff + 1.96 * np.sqrt(var)])
+    # flag1 = (t >= 1980) & (t <= 2000)
+    # flag2 = (t >= 2000) & (t <= 2021)
+    # flag = (t >= 1980)
+    # var1 = np.sum(res2.var_pred_mean[flag1]) / (np.sum(flag1) ** 2)
+    # diff1 = np.sum((res2.predicted_mean - y)[flag1]) / np.sum(flag1)
+    # print(diff1, [diff1 - 1.96 * np.sqrt(var1), diff1 + 1.96 * np.sqrt(var1)])
+    # var2 = np.sum(res2.var_pred_mean[flag2]) / (np.sum(flag2) ** 2)
+    # diff2 = np.sum((res2.predicted_mean - y)[flag2]) / np.sum(flag2)
+    # print(diff2, [diff2 - 1.96 * np.sqrt(var2), diff2 + 1.96 * np.sqrt(var2)])
+    # var = np.sum(res2.var_pred_mean[flag]) / (np.sum(flag) ** 2)
+    # diff = np.sum((res2.predicted_mean - y)[flag]) / np.sum(flag)
+    # print(diff, [diff - 1.96 * np.sqrt(var), diff + 1.96 * np.sqrt(var)])
 
 
 if __name__ == '__main__':
