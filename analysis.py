@@ -82,11 +82,12 @@ def main():
     # plt.ylabel(r'损失泉流量（$m^3/s$）')
     # plt.tight_layout()
     # plt.show()
-    #
-    # data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]),
-    #                   (res2.predicted_mean - 1.96 * np.sqrt(sigma2)).reshape([-1, 1]),
-    #                   (res2.predicted_mean + 1.96 * np.sqrt(sigma2)).reshape([-1, 1])])
-    # np.savetxt('test.csv', data, delimiter=',', fmt='%s')
+
+    data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]),
+                      (res2.predicted_mean - 1.96 * np.sqrt(sigma2)).reshape([-1, 1]),
+                      (res2.predicted_mean + 1.96 * np.sqrt(sigma2)).reshape([-1, 1])])
+    data = np.hstack([data, data[:, 2:] - y.reshape([-1, 1])])
+    np.savetxt('test.csv', data, delimiter=',', fmt='%s')
 
     # flag1 = (t >= 1980) & (t <= 2000)
     # flag2 = (t >= 2001) & (t <= 2021)
