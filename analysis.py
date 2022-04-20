@@ -83,8 +83,8 @@ def main():
     plt.tight_layout()
     plt.show()
 
-    # data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1]), conf])
-    # np.savetxt('test.csv', data, delimiter=',', fmt='%s')
+    data = np.hstack([t.reshape([-1, 1]), y.reshape([-1, 1]), res2.predicted_mean.reshape([-1, 1])])
+    np.savetxt('test.csv', data, delimiter=',', fmt='%s')
 
     # flag1 = (t >= 1980) & (t <= 2000)
     # flag2 = (t >= 2000) & (t <= 2021)
